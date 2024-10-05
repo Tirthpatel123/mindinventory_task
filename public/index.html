@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+    </head>
+    <body>
+        <div id="chat-room">
+            <div id="messages">
+                <input type="text" id="message" placeholder="Enter messae">
+                <button id="send-btn">Send</button>
+            </div>
+        </div>
+    </body>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+    <script>
+        const socket = io('http://localhost:2124', {transport: ['websocket', 'polling']});
+
+        const username = prompt('Tirth');
+        const room = prompt('123');
+        socket.emit('joinRoom', {username,room});
+
+        document.getElementById('send-btn').addEventListener('click', () => {
+            const message = document.getElementById('message').value;
+            socket.emit('chatMessage', {username, room, message});
+            document.getElementById('message').value = '';
+        })
+
+        socket.on('message', (messageData) => {
+            const messagesDiv = document.getElementById('messages');
+            const newMessage = document.createElement('div');
+            newMessage.textContent = `${messageData.user}: ${messageData.message}`;
+            messagesDiv.appendChild(newMessage);
+        });
+
+        socket.on('typing', (typingData) => {
+            console.log(`${typingData.user} is typing...`)
+        })
+
+       
+    </script>
+</html>
